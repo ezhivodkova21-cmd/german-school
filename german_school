@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Школа немецкого языка "К ЦЕЛИ" 🇩🇪</title>
+    
+    <!-- Подключение шрифтов Poppins и Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Подключение Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Настройка конфигурации Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: '#1E293B',    // Slate 800 - Строгий темно-синий (основа)
+                            secondary: '#334155',  // Slate 700 - Текст
+                            accent: '#F59E0B',     // Amber 500 - Оранжевый акцент
+                            accentHover: '#D97706',// Amber 600 - Ховер для кнопок
+                            bg: '#F8FAFC',         // Slate 50 - Очень светлый фон
+                            surface: '#FFFFFF',    // Белый
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Poppins', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        'lg': '0.5rem',
+                        'xl': '0.75rem',     // Более строгие углы
+                        '2xl': '1rem',
+                    },
+                    boxShadow: {
+                        'subtle': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.01)',
+                        'hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 15px rgba(245, 158, 11, 0.35)', // Свечение для акцентов
+                        'soft-vol': '0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04)', // Объемная мягкая тень
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Иконки Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            background-color: #F8FAFC; 
+            color: #334155;
+            line-height: 1.6;
+        }
+        
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+
+        /* Скрываем скроллбар для карусели, но оставляем функционал */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .hover-card {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-card:hover {
+            transform: translateY(-4px);
+            border-color: #F59E0B;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Стилизация select */
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23F59E0B' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 1rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+        }
+    </style>
+</head>
+<body class="smooth-scroll antialiased selection:bg-brand-accent selection:text-white relative">
+
+    <!-- Навигация -->
+    <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-md py-4 border-b border-gray-100 shadow-sm transition-all duration-300" id="navbar">
+        <div class="w-full px-6 md:px-12 flex justify-between items-center text-left relative">
+            <!-- Логотип -->
+            <a href="#" class="flex flex-col items-start gap-1 group z-50 relative">
+                <div class="bg-brand-primary text-white px-5 py-2 rounded-lg flex items-center justify-center font-heading font-bold text-xl tracking-wide shadow-lg group-hover:bg-brand-accent transition-all duration-300 text-left">
+                    К ЦЕЛИ
+                </div>
+                <span class="text-[10px] uppercase tracking-[0.15em] text-brand-secondary font-semibold pl-1">языковая школа</span>
+            </a>
+            
+            <!-- Десктопное меню -->
+            <div class="hidden md:flex items-center space-x-8 font-heading text-sm font-medium text-brand-secondary text-left">
+                <a href="#approach" class="hover:text-brand-accent transition-colors">О школе</a>
+                <a href="#formats" class="hover:text-brand-accent transition-colors">Форматы обучения</a>
+                <a href="#contact" class="hover:text-brand-accent transition-colors">Контакты</a>
+                <a href="#" class="hover:text-brand-accent transition-colors">Другие языки</a>
+            </div>
+
+            <!-- Десктопная кнопка -->
+            <button onclick="scrollToContact()" class="hidden md:block bg-brand-accent text-white font-heading font-medium text-sm px-6 py-2.5 rounded-lg hover:bg-brand-accentHover transition-all shadow-md hover:shadow-glow transform active:scale-95">
+                Записаться на занятия
+            </button>
+
+            <!-- Мобильная кнопка меню -->
+            <button class="md:hidden text-brand-primary z-50 relative p-2" onclick="toggleMobileMenu()" aria-label="Menu">
+                <i data-lucide="menu" id="menuIcon"></i>
+                <i data-lucide="x" id="closeIcon" class="hidden"></i>
+            </button>
+        </div>
+
+        <!-- Мобильное меню -->
+        <div id="mobileMenu" class="fixed inset-0 bg-white z-40 flex flex-col justify-center items-center gap-8 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden">
+            <a href="#approach" onclick="toggleMobileMenu()" class="text-2xl font-heading font-bold text-brand-primary hover:text-brand-accent">О школе</a>
+            <a href="#formats" onclick="toggleMobileMenu()" class="text-2xl font-heading font-bold text-brand-primary hover:text-brand-accent">Форматы</a>
+            <a href="#reviews" onclick="toggleMobileMenu()" class="text-2xl font-heading font-bold text-brand-primary hover:text-brand-accent">Отзывы</a>
+            <a href="#contact" onclick="toggleMobileMenu()" class="text-2xl font-heading font-bold text-brand-primary hover:text-brand-accent">Контакты</a>
+            
+            <button onclick="toggleMobileMenu(); scrollToContact()" class="bg-brand-accent text-brand-primary font-heading font-bold px-8 py-4 rounded-xl shadow-lg mt-4">
+                Записаться на занятия
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Главный экран (Hero) -->
+    <header class="relative pt-56 pb-20 px-6 overflow-hidden min-h-[75vh] flex items-center text-left">
+        <!-- Фон -->
+        <div class="absolute inset-0 -z-20">
+            <img src="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&q=80&w=1920" alt="Берлин архитектура" class="w-full h-full object-cover filter grayscale-[30%]">
+        </div>
+        
+        <div class="absolute inset-0 bg-brand-primary/85 mix-blend-multiply -z-10"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-brand-primary/90 to-transparent -z-10"></div>
+
+        <div class="container mx-auto max-w-6xl fade-in-up">
+            <div class="max-w-4xl">
+                <div class="inline-flex items-center gap-2 py-1.5 px-3 rounded border border-brand-accent/50 text-brand-accent text-xs font-bold uppercase tracking-widest mb-8 bg-brand-primary/50 backdrop-blur-sm">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse"></span>
+                    Онлайн занятия для взрослых и детей. С нуля до С1
+                </div>
+                
+                <h1 class="font-heading font-bold text-3xl md:text-5xl text-white leading-[1.2] mb-10">
+                    Немецкий язык для жизни, переезда и <span class="text-brand-accent">уверенного общения</span>
+                </h1>
+                
+                <p class="text-lg md:text-xl text-gray-300 max-w-xl mb-10 leading-relaxed font-light border-l-2 border-brand-accent pl-6">
+                    Уже больше года исполняем самые смелые мечты наших учеников о переезде, путешествиях и учебе за границей.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button onclick="document.getElementById('formats').scrollIntoView({behavior: 'smooth'})" class="bg-brand-accent text-brand-primary font-heading font-bold px-8 py-4 rounded-lg hover:bg-white transition-all shadow-glow flex items-center justify-center gap-2 text-sm group w-full sm:w-auto">
+                        Форматы обучения
+                    </button>
+                    <button onclick="scrollToContact()" class="border border-white/30 text-white font-heading font-medium px-8 py-4 rounded-lg hover:bg-white/10 hover:border-white transition-all flex items-center justify-center gap-2 text-sm w-full sm:w-auto">
+                        Бесплатная диагностика
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- БЛОК: Результаты наших учеников -->
+    <section id="reviews" class="pt-10 pb-20 px-6 bg-white border-b border-gray-100">
+        <div class="container mx-auto max-w-6xl">
+            <div class="mb-12 text-center">
+                <h2 class="font-heading font-bold text-3xl md:text-4xl text-brand-primary mb-4">Результаты наших учеников</h2>
+                <p class="text-brand-secondary text-lg not-italic max-w-3xl mx-auto">
+                    Ежедневно наши ученики сдают экзамены на высокие баллы, переезжают за границу для работы и учебы, чувствуют себя уверенно в общении и кайфуют от применения своих знаний
+                </p>
+                
+                <!-- Кнопки навигации для десктопа -->
+                <div class="hidden md:flex justify-end gap-2 mt-8 pr-4">
+                    <button onclick="scrollReviews('left')" class="p-2 rounded-full border border-gray-200 hover:bg-brand-accent hover:text-white hover:border-brand-accent transition-all">
+                        <i data-lucide="chevron-left" size="24"></i>
+                    </button>
+                    <button onclick="scrollReviews('right')" class="p-2 rounded-full border border-gray-200 hover:bg-brand-accent hover:text-white hover:border-brand-accent transition-all">
+                        <i data-lucide="chevron-right" size="24"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Контейнер карусели -->
+            <div id="reviews-container" class="flex gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-6 -mx-6 px-6 md:mx-0 md:px-0">
+                
+                <!-- 1. Аделия (Нежно-голубой) -->
+                <div class="aspect-square min-w-[280px] w-[280px] flex-shrink-0 snap-center bg-blue-50/70 p-6 rounded-2xl hover-card border border-white shadow-soft-vol relative group flex flex-col justify-between text-left">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm flex-shrink-0">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200" alt="Аделия" class="w-full h-full object-cover">
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="font-heading font-bold text-base text-brand-primary truncate">Аделия</h4>
+                            <span class="text-xs text-brand-secondary block truncate">Студентка</span>
+                        </div>
+                    </div>
+                    <div class="flex-grow flex items-center">
+                        <p class="font-bold text-brand-primary leading-snug text-sm">Осуществила мечту о переезде: сдала А1 за 5 недель</p>
+                    </div>
+                    <p class="text-xs text-brand-secondary leading-relaxed border-t border-blue-200/50 pt-3 italic">"За полтора месяца подготовилась с полного нуля и успешно сдала экзамен. Системно и понятно."</p>
+                </div>
+
+                <!-- 2. Артем (Нежно-розовый) -->
+                <div class="aspect-square min-w-[280px] w-[280px] flex-shrink-0 snap-center bg-rose-50/70 p-6 rounded-2xl hover-card border border-white shadow-soft-vol relative group flex flex-col justify-between text-left">
+                    <div class="absolute top-3 right-3 bg-rose-200/40 text-rose-600 text-[10px] font-bold px-2 py-1 rounded">ШКОЛА</div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm flex-shrink-0">
+                            <img src="https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&q=80&w=200" alt="Артем" class="w-full h-full object-cover">
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="font-heading font-bold text-base text-brand-primary truncate">Артем</h4>
+                            <span class="text-xs text-brand-secondary block truncate">10 лет, 4 класс</span>
+                        </div>
+                    </div>
+                    <div class="flex-grow flex items-center">
+                        <p class="font-bold text-brand-primary leading-snug text-sm">Освоился в немецкой школе и нашел друзей</p>
+                    </div>
+                    <p class="text-xs text-brand-secondary leading-relaxed border-t border-rose-200/50 pt-3 italic">"Сначала боялся идти в класс, ничего не понимал. А теперь пишет контрольные на 'единицы'."</p>
+                </div>
+
+                <!-- 3. Кристина (Нежно-зеленый) -->
+                <div class="aspect-square min-w-[280px] w-[280px] flex-shrink-0 snap-center bg-emerald-50/70 p-6 rounded-2xl hover-card border border-white shadow-soft-vol relative group flex flex-col justify-between text-left">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm flex-shrink-0">
+                            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=200" alt="Кристина" class="w-full h-full object-cover">
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="font-heading font-bold text-base text-brand-primary truncate">Кристина</h4>
+                            <span class="text-xs text-brand-secondary block truncate">IT-специалист</span>
+                        </div>
+                    </div>
+                    <div class="flex-grow flex items-center">
+                        <p class="font-bold text-brand-primary leading-snug text-sm">Сдала А1 на 100 % и получила ВНЖ</p>
+                    </div>
+                    <p class="text-xs text-brand-secondary leading-relaxed border-t border-emerald-200/50 pt-3 italic">"Почти с нуля за 21 день до максимального результата. Мечта сбылась!"</p>
+                </div>
+
+                <!-- 4. Диана (Нежно-желтый) -->
+                <div class="aspect-square min-w-[280px] w-[280px] flex-shrink-0 snap-center bg-amber-50/70 p-6 rounded-2xl hover-card border border-white shadow-soft-vol relative group flex flex-col justify-between text-left">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm flex-shrink-0">
+                            <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=200" alt="Диана" class="w-full h-full object-cover">
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="font-heading font-bold text-base text-brand-primary truncate">Диана</h4>
+                            <span class="text-xs text-brand-secondary block truncate">Маркетолог</span>
+                        </div>
+                    </div>
+                    <div class="flex-grow flex items-center">
+                        <p class="font-bold text-brand-primary leading-snug text-sm">Получила оффер мечты: прорыв до уровня В1</p>
+                    </div>
+                    <p class="text-xs text-brand-secondary leading-relaxed border-t border-amber-200/50 pt-3 italic">"Сдала А2 на 81 балл. Теперь я работаю в немецкой компании."</p>
+                </div>
+
+                <!-- 5. Дмитрий (Нежно-фиолетовый) -->
+                <div class="aspect-square min-w-[280px] w-[280px] flex-shrink-0 snap-center bg-violet-50/70 p-6 rounded-2xl hover-card border border-white shadow-soft-vol relative group flex flex-col justify-between text-left">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm flex-shrink-0">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200" alt="Дмитрий" class="w-full h-full object-cover">
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="font-heading font-bold text-base text-brand-primary truncate">Дмитрий</h4>
+                            <span class="text-xs text-brand-secondary block truncate">Хирург</span>
+                        </div>
+                    </div>
+                    <div class="flex-grow flex items-center">
+                        <p class="font-bold text-brand-primary leading-snug text-sm">Сдал Fachsprachprüfung (FSP) с первого раза</p>
+                    </div>
+                    <p class="text-xs text-brand-secondary leading-relaxed border-t border-violet-200/50 pt-3 italic">"Сложнейший экзамен для врачей позади. Спасибо за интенсивную подготовку."</p>
+                </div>
+
+                <!-- 6. Елена (Нежно-индиго) -->
+                <div class="aspect-square min-w-[280px] w-[280px] flex-shrink-0 snap-center bg-indigo-50/70 p-6 rounded-2xl hover-card border border-white shadow-soft-vol relative group flex flex-col justify-between text-left">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm flex-shrink-0">
+                            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&q=80&w=200" alt="Елена" class="w-full h-full object-cover">
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="font-heading font-bold text-base text-brand-primary truncate">Елена</h4>
+                            <span class="text-xs text-brand-secondary block truncate">Семья</span>
+                        </div>
+                    </div>
+                    <div class="flex-grow flex items-center">
+                        <p class="font-bold text-brand-primary leading-snug text-sm">Переехали к детям и внукам в Гамбург</p>
+                    </div>
+                    <p class="text-xs text-brand-secondary leading-relaxed border-t border-indigo-200/50 pt-3 italic">"Учили язык вместе с мужем. Было страшно начинать в 50+, но формат очень комфортный."</p>
+                </div>
+            </div>
+            
+            <!-- Индикаторы слайдов (точки) -->
+            <div class="flex md:hidden justify-center gap-2 mt-6">
+                <div class="w-2 h-2 rounded-full bg-brand-accent"></div>
+                <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- БЛОК: Поможем осуществить вашу мечту -->
+    <section id="goals" class="pt-10 pb-24 px-6 bg-brand-bg">
+        <div class="container mx-auto max-w-6xl">
+            <div class="mb-16 text-center">
+                <h2 class="font-heading font-bold text-3xl md:text-4xl text-brand-primary mb-4 inline-flex items-center justify-center gap-2">
+                    Поможем осуществить вашу мечту
+                    <i data-lucide="sparkles" class="text-brand-accent" size="28"></i>
+                </h2>
+                <p class="text-brand-secondary max-w-2xl mx-auto font-medium">
+                    Мы знаем самый короткий и комфортный путь изучения языка и составим ваш персональный маршрут к цели
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+                <!-- 1. Уверенность -->
+                <div class="bg-white p-8 rounded-xl hover-card border border-gray-100 shadow-subtle flex flex-col h-full group">
+                    <div class="w-12 h-12 bg-brand-bg rounded-lg flex items-center justify-center text-brand-primary mb-6 group-hover:bg-brand-accent group-hover:text-white transition-colors duration-300">
+                        <i data-lucide="smile" size="24"></i>
+                    </div>
+                    <h3 class="font-heading font-bold text-lg mb-3 text-brand-primary">Уверенность</h3>
+                    <p class="text-sm text-brand-secondary mb-6 flex-grow leading-relaxed">Свободное общение в путешествиях и с друзьями без языкового барьера.</p>
+                    <button onclick="scrollToContact()" class="w-full py-3 bg-brand-bg text-brand-primary font-bold rounded-lg hover:bg-brand-accent hover:text-white transition-all text-xs uppercase tracking-wider shadow-sm">
+                        Моя цель
+                    </button>
+                </div>
+
+                <!-- 2. Образование -->
+                <div class="bg-white p-8 rounded-xl hover-card border border-gray-100 shadow-subtle flex flex-col h-full group">
+                    <div class="w-12 h-12 bg-brand-bg rounded-lg flex items-center justify-center text-brand-primary mb-6 group-hover:bg-brand-accent group-hover:text-white transition-colors duration-300">
+                        <i data-lucide="award" size="24"></i>
+                    </div>
+                    <h3 class="font-heading font-bold text-lg mb-3 text-brand-primary">Школа и ВУЗ</h3>
+                    <p class="text-sm text-brand-secondary mb-6 flex-grow leading-relaxed">Поступление в ВУЗ, экзамены Гете и помощь детям со школьной программой</p>
+                    <button onclick="scrollToContact()" class="w-full py-3 bg-brand-bg text-brand-primary font-bold rounded-lg hover:bg-brand-accent hover:text-white transition-all text-xs uppercase tracking-wider shadow-sm">
+                        Моя цель
+                    </button>
+                </div>
+
+                <!-- 3. Переезд -->
+                <div class="bg-white p-8 rounded-xl hover-card border border-gray-100 shadow-subtle flex flex-col h-full group">
+                    <div class="w-12 h-12 bg-brand-bg rounded-lg flex items-center justify-center text-brand-primary mb-6 group-hover:bg-brand-accent group-hover:text-white transition-colors duration-300">
+                        <i data-lucide="plane" size="24"></i>
+                    </div>
+                    <h3 class="font-heading font-bold text-lg mb-3 text-brand-primary">Переезд</h3>
+                    <p class="text-sm text-brand-secondary mb-6 flex-grow leading-relaxed">Полная языковая подготовка для воссоединения семьи или иммиграции.</p>
+                    <button onclick="scrollToContact()" class="w-full py-3 bg-brand-bg text-brand-primary font-bold rounded-lg hover:bg-brand-accent hover:text-white transition-all text-xs uppercase tracking-wider shadow-sm">
+                        Моя цель
+                    </button>
+                </div>
+
+                <!-- 4. Карьера -->
+                <div class="bg-white p-8 rounded-xl hover-card border border-gray-100 shadow-subtle flex flex-col h-full group">
+                    <div class="w-12 h-12 bg-brand-bg rounded-lg flex items-center justify-center text-brand-primary mb-6 group-hover:bg-brand-accent group-hover:text-white transition-colors duration-300">
+                        <i data-lucide="briefcase" size="24"></i>
+                    </div>
+                    <h3 class="font-heading font-bold text-lg mb-3 text-brand-primary">Карьера</h3>
+                    <p class="text-sm text-brand-secondary mb-6 flex-grow leading-relaxed">Деловой немецкий для работы в IT, медицине и бизнесе в Европе.</p>
+                    <button onclick="scrollToContact()" class="w-full py-3 bg-brand-bg text-brand-primary font-bold rounded-lg hover:bg-brand-accent hover:text-white transition-all text-xs uppercase tracking-wider shadow-sm">
+                        Моя цель
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- БЛОК: Наш подход -->
+    <section id="approach" class="py-20 px-6 bg-white border-y border-gray-100 text-left">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row gap-12 items-center">
+                <div class="md:w-1/3">
+                    <span class="text-brand-accent font-bold text-xs uppercase tracking-widest mb-2 block">Методика обучения</span>
+                    <h2 class="font-heading font-bold text-3xl md:text-4xl text-brand-primary mb-6">Наш подход к обучению</h2>
+                    <p class="text-brand-secondary mb-8 leading-relaxed">
+                        Экзамен — это стресс, но подготовка к нему может быть понятной системой.
+                    </p>
+                </div>
+                
+                <div class="md:w-2/3 grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div class="bg-brand-bg p-6 rounded-xl border-l-4 border-brand-accent">
+                        <i data-lucide="brain-circuit" class="text-brand-primary mb-4" size="28"></i>
+                        <h3 class="font-bold text-lg text-brand-primary mb-2">Системность</h3>
+                        <p class="text-sm text-brand-secondary">Никакого хаоса. Четкие чек-листы по темам. Вы всегда знаете, сколько осталось до цели.</p>
+                    </div>
+                    
+                    <div class="bg-brand-bg p-6 rounded-xl border-l-4 border-gray-300">
+                        <i data-lucide="clock" class="text-brand-primary mb-4" size="28"></i>
+                        <h3 class="font-bold text-lg text-brand-primary mb-2">Скорость</h3>
+                        <p class="text-sm text-brand-secondary">Интенсивные форматы для тех, кто спешит. Подготовим к уровню А1 за 1,5 месяца.</p>
+                    </div>
+                    
+                    <div class="bg-brand-bg p-6 rounded-xl border-l-4 border-gray-300">
+                        <i data-lucide="shield-check" class="text-brand-primary mb-4" size="28"></i>
+                        <h3 class="font-bold text-lg text-brand-primary mb-2">Поддержка</h3>
+                        <p class="text-sm text-brand-secondary">Вы не останетесь одни. Постоянная обратная связь в чате и помощь с домашним заданием.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- БЛОК: Форматы и Цены -->
+    <section id="formats" class="pt-10 pb-8 px-6 bg-brand-bg">
+        <div class="container mx-auto text-center mb-12">
+            <h2 class="font-heading font-bold text-3xl md:text-4xl text-brand-primary mb-4">Форматы и цены</h2>
+            <p class="text-brand-secondary text-sm mb-12">Выберите удобный формат занятий онлайн</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12 items-start text-left">
+                <!-- 1. Групповые занятия -->
+                <div class="bg-white p-8 rounded-xl border border-brand-accent shadow-glow transform md:-translate-y-4 flex flex-col relative overflow-hidden h-full hover-card">
+                    <div class="absolute top-0 right-0 bg-brand-accent text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">POPULAR</div>
+                    <div class="mb-6 flex justify-between items-start">
+                        <span class="bg-brand-accent/10 text-brand-accent text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Основной курс</span>
+                        <i data-lucide="book-open" class="text-brand-accent" size="20"></i>
+                    </div>
+                    <h3 class="font-heading font-bold text-2xl text-brand-primary mb-1">Групповые занятия</h3>
+                    <p class="text-xs text-brand-accent font-bold uppercase tracking-wider mb-2">Мини-группа 4-5 человек</p>
+                    <div class="flex items-baseline gap-1 mb-6">
+                        <span class="text-2xl font-bold text-brand-primary">500₽</span>
+                        <span class="text-sm text-gray-500">/ час</span>
+                    </div>
+
+                    <div class="space-y-6 flex-grow">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="zap" size="16" class="text-brand-accent"></i>
+                                <span class="text-sm font-bold text-brand-primary">Обучаем быстро</span>
+                            </div>
+                            <ul class="text-xs text-brand-secondary space-y-1 pl-6">
+                                <li>A1: 4-6 недель</li>
+                                <li>A2: 6-9 недель</li>
+                                <li>B1: 12-16 недель</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="file-check" size="16" class="text-brand-accent"></i>
+                                <span class="text-sm font-bold text-brand-primary">Экзамены</span>
+                            </div>
+                            <p class="text-xs text-brand-secondary pl-6">Подготовка к Goethe, Telc, ÖSD.</p>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="message-square" size="16" class="text-brand-accent"></i>
+                                <span class="text-sm font-bold text-brand-primary">80% Практики</span>
+                            </div>
+                            <p class="text-xs text-brand-secondary pl-6 leading-relaxed">
+                                Максимум живого общения.
+                            </p>
+                        </div>
+                    </div>
+
+                    <button onclick="scrollToContact()" class="w-full py-3 mt-8 bg-brand-accent text-white font-bold rounded-lg hover:bg-brand-accentHover transition-all text-sm shadow-md">
+                        Записаться в группу
+                    </button>
+                </div>
+
+                <!-- 2. Разговорный клуб -->
+                <div class="bg-white p-8 rounded-xl border border-gray-100 hover:border-brand-primary hover:shadow-lg transition-all flex flex-col relative overflow-hidden group h-full hover-card">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gray-200 group-hover:bg-brand-primary transition-colors"></div>
+                    <div class="mb-6 flex justify-between items-start">
+                        <span class="bg-gray-100 text-brand-primary text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Разговорная практика</span>
+                        <i data-lucide="messages-square" class="text-brand-primary" size="20"></i>
+                    </div>
+                    <h3 class="font-heading font-bold text-2xl text-brand-primary mb-2">Разговорный клуб</h3>
+                    <div class="flex flex-col mb-6">
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-2xl font-bold text-brand-primary">500₽</span>
+                            <span class="text-sm text-gray-500">/ час</span>
+                        </div>
+                        <div class="text-xs text-brand-accent font-bold mt-1">или 2500₽ за 4 занятия</div>
+                    </div>
+
+                    <div class="space-y-6 flex-grow">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="users" size="16" class="text-brand-accent"></i>
+                                <span class="text-sm font-bold text-brand-primary">Мини-группа</span>
+                            </div>
+                            <p class="text-xs text-brand-secondary pl-6">Комфортная группа 4-6 человек.</p>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="layers" size="16" class="text-brand-accent"></i>
+                                <span class="text-sm font-bold text-brand-primary">Темы клубов</span>
+                            </div>
+                            <ul class="text-xs text-brand-secondary space-y-2 pl-6">
+                                <li class="flex items-center gap-2"><div class="w-1 h-1 bg-brand-accent rounded-full"></div> Разговорный клуб</li>
+                                <li class="flex items-center gap-2"><div class="w-1 h-1 bg-brand-accent rounded-full"></div> Грамматика А1</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <button onclick="scrollToContact()" class="w-full py-3 mt-8 bg-brand-primary text-white font-bold rounded-lg hover:bg-brand-primary/90 transition-all text-sm">
+                        Выбрать клуб
+                    </button>
+                </div>
+
+                <!-- 3. Индивидуально -->
+                <div class="bg-white p-8 rounded-xl border border-gray-100 hover:border-brand-primary hover:shadow-lg transition-all flex flex-col relative overflow-hidden group h-full hover-card">
+                     <div class="absolute top-0 left-0 w-full h-1 bg-gray-200 group-hover:bg-brand-primary transition-colors"></div>
+                    <div class="mb-6 flex justify-between items-start">
+                        <span class="bg-gray-100 text-brand-primary text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Лично</span>
+                        <i data-lucide="crown" class="text-brand-primary" size="20"></i>
+                    </div>
+                    <h3 class="font-heading font-bold text-2xl text-brand-primary mb-2">Индивидуально</h3>
+                    <div class="flex items-baseline gap-1 mb-6">
+                        <span class="text-2xl font-bold text-brand-primary">1950₽</span>
+                        <span class="text-sm text-gray-500">/ час</span>
+                    </div>
+
+                    <div class="space-y-6 flex-grow">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="user" size="16" class="text-brand-accent"></i>
+                                <span class="text-sm font-bold text-brand-primary">Персонально</span>
+                            </div>
+                            <p class="text-xs text-brand-secondary pl-6">Занятия 1 на 1 с преподавателем.</p>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="calendar" size="16" class="text-brand-accent"></i>
+                                <span class="text-sm font-bold text-brand-primary">Гибкий график</span>
+                            </div>
+                            <p class="text-xs text-brand-secondary pl-6">Подбираем время удобное вам.</p>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="settings" size="16" class="text-brand-accent"></i>
+                                <span class="text-sm font-bold text-brand-primary">Ваша программа</span>
+                            </div>
+                            <p class="text-xs text-brand-secondary pl-6 leading-relaxed">
+                                Программа, разработанная специально для вас.
+                            </p>
+                        </div>
+                    </div>
+
+                    <button onclick="scrollToContact()" class="w-full py-3 mt-8 border border-brand-primary text-brand-primary font-bold rounded-lg hover:bg-brand-primary hover:text-white transition-all text-sm">
+                        Индивидуально
+                    </button>
+                </div>
+            </div>
+
+            <!-- Подарки -->
+            <div class="max-w-4xl mx-auto bg-brand-primary rounded-xl p-6 md:p-8 text-white relative overflow-hidden shadow-2xl text-left">
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-brand-accent rounded-full blur-3xl opacity-20"></div>
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-brand-accent text-white rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg animate-pulse">
+                            <i data-lucide="gift" size="24"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-1">Ваши подарки</h4>
+                            <p class="text-sm text-gray-300">
+                                <span class="text-brand-accent font-bold">-50%</span> на первое занятие или бесплатная диагностика.<br>
+                                <span class="text-brand-accent font-bold">2 урока</span> в подарок при покупке курса.
+                            </p>
+                        </div>
+                    </div>
+                    <button onclick="scrollToContact()" class="bg-white text-brand-primary font-bold px-6 py-3 rounded-lg hover:bg-brand-accent hover:text-white transition-all text-sm whitespace-nowrap shadow-md">
+                        Забрать подарок
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- БЛОК: Наши преподаватели -->
+    <section id="teachers" class="pb-24 px-6 bg-brand-bg text-left">
+        <div class="container mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="font-heading font-bold text-3xl md:text-4xl text-brand-primary mb-4">Наши преподаватели</h2>
+                <p class="text-brand-secondary max-w-3xl mx-auto leading-relaxed">
+                    Наши преподаватели — не только профессионалы своего дела, но и чуткие наставники.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <!-- Анна -->
+                <div class="bg-white p-6 rounded-xl hover-card border border-gray-100 shadow-subtle group">
+                    <div class="relative overflow-hidden rounded-lg mb-4 aspect-[3/4] mx-auto w-full">
+                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=400" alt="Анна" class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div class="absolute bottom-0 w-full bg-brand-primary/90 text-white text-[10px] font-bold py-2 uppercase tracking-wider">Эксперт TestDaF</div>
+                    </div>
+                    <h4 class="font-heading font-bold text-lg text-brand-primary">Анна</h4>
+                    <p class="text-xs text-brand-secondary">Готовит к поступлению в ВУЗ</p>
+                </div>
+
+                <!-- Маркус -->
+                <div class="bg-white p-6 rounded-xl hover-card border border-gray-100 shadow-subtle group">
+                     <div class="relative overflow-hidden rounded-lg mb-4 aspect-[3/4] mx-auto w-full">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400" alt="Маркус" class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div class="absolute bottom-0 w-full bg-brand-accent text-brand-primary text-[10px] font-bold py-2 uppercase tracking-wider">Носитель (C2)</div>
+                    </div>
+                    <h4 class="font-heading font-bold text-lg text-brand-primary">Маркус</h4>
+                    <p class="text-xs text-brand-secondary">Разговорная практика</p>
+                </div>
+
+                <!-- Елена -->
+                 <div class="bg-white p-6 rounded-xl hover-card border border-gray-100 shadow-subtle group">
+                    <div class="relative overflow-hidden rounded-lg mb-4 aspect-[3/4] mx-auto w-full">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400" alt="Елена" class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div class="absolute bottom-0 w-full bg-brand-primary/90 text-white text-[10px] font-bold py-2 uppercase tracking-wider">Лицензия Telc</div>
+                    </div>
+                    <h4 class="font-heading font-bold text-lg text-brand-primary">Елена</h4>
+                    <p class="text-xs text-brand-secondary">Уровни B1-B2</p>
+                </div>
+
+                <!-- Юлия -->
+                 <div class="bg-white p-6 rounded-xl hover-card border border-gray-100 shadow-subtle group">
+                    <div class="relative overflow-hidden rounded-lg mb-4 aspect-[3/4] mx-auto w-full">
+                        <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=400" alt="Юлия" class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500">
+                         <div class="absolute bottom-0 w-full bg-brand-primary/90 text-white text-[10px] font-bold py-2 uppercase tracking-wider">Start Deutsch A1</div>
+                    </div>
+                    <h4 class="font-heading font-bold text-lg text-brand-primary">Юлия</h4>
+                    <p class="text-xs text-brand-secondary">Start Deutsch A1</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="bg-brand-primary text-white py-20 px-6 border-t-4 border-brand-accent text-left">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-start gap-12 max-w-5xl mx-auto">
+                <div class="md:w-1/2">
+                    <h2 class="font-heading font-bold text-3xl md:text-4xl mb-6 text-white">Готовы к цели?</h2>
+                    <p class="text-gray-400 mb-8 text-base leading-relaxed">
+                        Напишите нам и мы составим персональный план вашего обучения.
+                    </p>
+                    
+                    <div class="flex flex-col gap-4 text-sm text-gray-300">
+                         <div class="flex items-start gap-3">
+                            <i data-lucide="gift" class="text-brand-accent mt-1 flex-shrink-0"></i>
+                            <span>Скидка 50% на первое занятие или бесплатная диагностика уровня</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:w-1/2 w-full bg-white/5 p-8 rounded-xl border border-white/10 shadow-2xl relative overflow-hidden">
+                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-accent/20 rounded-full blur-3xl"></div>
+                    <form id="contactForm" class="space-y-4 relative z-10" onsubmit="handleFormSubmit(event)">
+                        <div>
+                            <input type="text" required class="w-full px-4 py-3 rounded-lg bg-brand-primary border border-gray-700 text-white focus:outline-none focus:border-brand-accent transition-all text-sm placeholder-gray-400" placeholder="Ваше имя">
+                        </div>
+                        <div>
+                            <input type="tel" required class="w-full px-4 py-3 rounded-lg bg-brand-primary border border-gray-700 text-white focus:outline-none focus:border-brand-accent transition-all text-sm placeholder-gray-400" placeholder="Телефон или Telegram">
+                        </div>
+                        
+                        <div>
+                            <select required class="w-full px-4 py-3 rounded-lg bg-brand-primary border border-gray-700 text-white focus:outline-none focus:border-brand-accent appearance-none cursor-pointer text-sm">
+                                <option value="" disabled selected class="text-gray-400">Ваша цель?</option>
+                                <option value="relocation">Переезд</option>
+                                <option value="exam">Экзамен</option>
+                                <option value="speaking">Общение</option>
+                                <option value="child">Обучение ребенка</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="w-full bg-brand-accent text-brand-primary font-heading font-bold uppercase tracking-wider px-6 py-4 rounded-lg hover:bg-white transition-all shadow-glow mt-4 text-sm">
+                            Записаться на занятие
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
+                <p>&copy; 2023 Школа немецкого языка "К ЦЕЛИ".</p>
+                <div class="flex gap-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-brand-accent transition">Telegram</a>
+                    <a href="#" class="hover:text-brand-accent transition">WhatsApp</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        function scrollToContact() {
+            const contactSection = document.getElementById('contact');
+            if (contactSection) {
+                contactSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function scrollReviews(direction) {
+            const container = document.getElementById('reviews-container');
+            if (!container) return;
+            const card = container.querySelector('div');
+            const scrollAmount = card ? card.offsetWidth + 24 : 350;
+            
+            if (direction === 'left') {
+                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const originalText = btn.innerText;
+            
+            btn.innerText = "Спасибо! Мы скоро свяжемся с вами";
+            btn.classList.remove('bg-brand-accent', 'text-brand-primary');
+            btn.classList.add('bg-green-600', 'text-white');
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.add('bg-brand-accent', 'text-brand-primary');
+                btn.classList.remove('bg-green-600', 'text-white');
+                event.target.reset();
+            }, 3000);
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const menuIcon = document.getElementById('menuIcon');
+            const closeIcon = document.getElementById('closeIcon');
+            
+            if (!menu) return;
+
+            if (menu.classList.contains('opacity-0')) {
+                menu.classList.remove('opacity-0', 'pointer-events-none');
+                menu.classList.add('opacity-100', 'pointer-events-auto');
+                if (menuIcon) menuIcon.classList.add('hidden');
+                if (closeIcon) closeIcon.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                menu.classList.remove('opacity-100', 'pointer-events-auto');
+                menu.classList.add('opacity-0', 'pointer-events-none');
+                if (menuIcon) menuIcon.classList.remove('hidden');
+                if (closeIcon) closeIcon.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+    </script>
+</body>
+</html>
