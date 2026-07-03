@@ -1,0 +1,10 @@
+# Разворачивается на европейском сервере.
+# Единственный сервис, у которого есть ключи зарубежных LLM-провайдеров.
+services:
+  eu-llm-gateway:
+    build: ./eu-llm-gateway
+    ports:
+      - "8100:8100"
+    env_file:
+      - .env
+    restart: unless-stopped
