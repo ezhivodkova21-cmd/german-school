@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "scrape": "node src/scraper.js",
-    "scrape:browser": "node src/index-puppeteer.js"
+    "scrape:browser": "node src/index-puppeteer.js",
+    "scrape:youla": "node src/index-youla.js"
   },
   "keywords": ["avito", "scraper", "apartments", "tyumen"],
   "author": "",
