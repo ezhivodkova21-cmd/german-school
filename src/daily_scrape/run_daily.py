@@ -25,27 +25,31 @@ def main():
     parser.add_argument("--out-dir", required=True)
     parser.add_argument("--owner-only", action="store_true",
                         help="Только объявления от собственников (где эта информация доступна)")
+    parser.add_argument("--since-hours", type=float, default=24,
+                        help="Только объявления, опубликованные не позже N часов назад (по умолчанию 24 — 'за сутки')")
     args = parser.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)
     date_tag = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
-    print("=== Яндекс.Недвижимость: продажа (вторичка) ===")
+    print(f"=== Яндекс.Недвижимость: продажа (вторичка), за последние {args.since_hours} ч. ===")
     rows = yandex_realty.scrape("tyumen", "kupit/kvartira/vtorichniy-rynok",
-                                 max_pages=30, owner_only=args.owner_only)
+                                 max_pages=40, owner_only=args.owner_only,
+                                 since_hours=args.since_hours)
     yandex_realty.save_csv(rows, os.path.join(args.out_dir, f"yandex_sale_{date_tag}.csv"))
 
-    print("\n=== Яндекс.Недвижимость: аренда ===")
+    print(f"\n=== Яндекс.Недвижимость: аренда, за последние {args.since_hours} ч. ===")
     rows = yandex_realty.scrape("tyumen", "snyat/kvartira",
-                                 max_pages=30, owner_only=args.owner_only)
+                                 max_pages=40, owner_only=args.owner_only,
+                                 since_hours=args.since_hours)
     yandex_realty.save_csv(rows, os.path.join(args.out_dir, f"yandex_rent_{date_tag}.csv"))
 
-    print("\n=== Avito: продажа (вторичка) ===")
-    rows = avito.scrape(avito.SALE_URL, max_pages=15)
+    print(f"\n=== Avito: продажа (вторичка), за последние {args.since_hours} ч. ===")
+    rows = avito.scrape(avito.SALE_URL, max_pages=20, since_hours=args.since_hours)
     avito.save_csv(rows, os.path.join(args.out_dir, f"avito_sale_{date_tag}.csv"))
 
-    print("\n=== Avito: аренда ===")
-    rows = avito.scrape(avito.RENT_URL, max_pages=15)
+    print(f"\n=== Avito: аренда, за последние {args.since_hours} ч. ===")
+    rows = avito.scrape(avito.RENT_URL, max_pages=20, since_hours=args.since_hours)
     avito.save_csv(rows, os.path.join(args.out_dir, f"avito_rent_{date_tag}.csv"))
 
     print(f"\nГотово. Файлы сохранены в {args.out_dir}")

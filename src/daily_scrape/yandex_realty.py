@@ -12,7 +12,7 @@ import json
 import sys
 import time
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 BASE = "https://realty.yandex.ru"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -129,8 +129,14 @@ def normalize(offer, source_label="Яндекс.Недвижимость"):
     }
 
 
-def scrape(city_slug, deal_path, max_pages=30, owner_only=False, delay=2):
-    """deal_path: 'kupit/kvartira' для продажи, 'snyat/kvartira' для аренды."""
+def scrape(city_slug, deal_path, max_pages=30, owner_only=False, delay=2, since_hours=None):
+    """deal_path: 'kupit/kvartira' для продажи, 'snyat/kvartira' для аренды.
+
+    since_hours: если задано, останавливает пагинацию, как только
+    самое старое объявление на странице старше cutoff, и в конце
+    отфильтровывает результат строго по этой границе (объявления
+    отсортированы по дате публикации, убывание)."""
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=since_hours) if since_hours else None
     all_offers = {}
     page = 0
     while page <= max_pages:
@@ -154,10 +160,19 @@ def scrape(city_slug, deal_path, max_pages=30, owner_only=False, delay=2):
             oid = e.get("offerId")
             if oid:
                 all_offers[oid] = e
+
+        if cutoff:
+            oldest_raw = min((e.get("creationDate", "") for e in entities), default="")
+            oldest_dt = _parse_iso(oldest_raw)
+            if oldest_dt and oldest_dt < cutoff:
+                break
+
         page += 1
         time.sleep(delay)
 
     rows = [normalize(o) for o in all_offers.values()]
+    if cutoff:
+        rows = [r for r in rows if (_parse_iso(r["_creation_raw"]) or cutoff) >= cutoff]
     if owner_only:
         rows = [r for r in rows if r["Кто разместил"] == "Собственник"]
     rows.sort(key=lambda r: r["_creation_raw"], reverse=True)
@@ -165,6 +180,15 @@ def scrape(city_slug, deal_path, max_pages=30, owner_only=False, delay=2):
         del r["_offer_id"]
         del r["_creation_raw"]
     return rows
+
+
+def _parse_iso(value):
+    if not value:
+        return None
+    try:
+        return datetime.strptime(value[:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc)
+    except ValueError:
+        return None
 
 
 def save_csv(rows, path):
@@ -184,9 +208,12 @@ if __name__ == "__main__":
     parser.add_argument("--deal", choices=["sale", "rent"], required=True)
     parser.add_argument("--max-pages", type=int, default=30)
     parser.add_argument("--owner-only", action="store_true")
+    parser.add_argument("--since-hours", type=float, default=None,
+                        help="Только объявления новее N часов (например 24 для 'за сутки')")
     parser.add_argument("--out", required=True)
     args = parser.parse_args()
 
     deal_path = "kupit/kvartira/vtorichniy-rynok" if args.deal == "sale" else "snyat/kvartira"
-    rows = scrape(args.city, deal_path, max_pages=args.max_pages, owner_only=args.owner_only)
+    rows = scrape(args.city, deal_path, max_pages=args.max_pages, owner_only=args.owner_only,
+                  since_hours=args.since_hours)
     save_csv(rows, args.out)

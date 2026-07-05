@@ -26,7 +26,7 @@ import sys
 import time
 import urllib.request
 import urllib.error
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 BASE = "https://www.avito.ru"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -136,10 +136,16 @@ def normalize(item, source_label="Avito"):
     }
 
 
-def scrape(start_url, max_pages=30, delay=6, stop_before_month=None, stop_before_year=None):
+def scrape(start_url, max_pages=30, delay=6, stop_before_month=None, stop_before_year=None,
+           since_hours=None):
     """stop_before_year/month: остановиться, как только объявления на
     странице становятся старше этой даты (для ограничения глубины
-    сбора, например только май-июль 2026)."""
+    сбора, например только май-июль 2026).
+
+    since_hours: если задано, останавливает пагинацию и фильтрует
+    результат строго по объявлениям новее этого числа часов (например
+    24 для "за последние сутки")."""
+    cutoff_ts = (datetime.now().timestamp() - since_hours * 3600) * 1000 if since_hours else None
     all_items = {}
     url = f"{start_url}?cd=1&s=104"
     page = 1
@@ -167,6 +173,9 @@ def scrape(start_url, max_pages=30, delay=6, stop_before_month=None, stop_before
         if stop_before_year and (oldest_dt.year, oldest_dt.month) < (stop_before_year, stop_before_month):
             print("  Достигли нижней границы дат, останавливаемся.")
             break
+        if cutoff_ts and oldest_ts < cutoff_ts:
+            print("  Достигли границы 'since_hours', останавливаемся.")
+            break
 
         pager = catalog.get("pager", {})
         next_path = pager.get("next")
@@ -177,6 +186,8 @@ def scrape(start_url, max_pages=30, delay=6, stop_before_month=None, stop_before
         time.sleep(delay)
 
     rows = [normalize(it) for it in all_items.values()]
+    if cutoff_ts:
+        rows = [r for r in rows if r["_ts"] >= cutoff_ts]
     rows.sort(key=lambda r: r["_ts"], reverse=True)
     for r in rows:
         del r["_id"]
@@ -201,10 +212,13 @@ if __name__ == "__main__":
     parser.add_argument("--max-pages", type=int, default=15)
     parser.add_argument("--min-year", type=int, default=None)
     parser.add_argument("--min-month", type=int, default=None)
+    parser.add_argument("--since-hours", type=float, default=None,
+                        help="Только объявления новее N часов (например 24 для 'за сутки')")
     parser.add_argument("--out", required=True)
     args = parser.parse_args()
 
     start_url = SALE_URL if args.deal == "sale" else RENT_URL
     rows = scrape(start_url, max_pages=args.max_pages,
-                  stop_before_year=args.min_year, stop_before_month=args.min_month)
+                  stop_before_year=args.min_year, stop_before_month=args.min_month,
+                  since_hours=args.since_hours)
     save_csv(rows, args.out)
