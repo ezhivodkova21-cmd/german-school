@@ -1,0 +1,15 @@
+node_modules/
+.env
+.env.local
+.env.*.local
+credentials.json
+apartments.json
+apartments.csv
+apartments_browser.json
+apartments_browser.csv
+*.log
+.DS_Store
+dist/
+build/
+.vscode/
+.idea/
