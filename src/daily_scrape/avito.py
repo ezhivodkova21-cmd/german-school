@@ -37,7 +37,15 @@ HEADERS = {
     "Accept-Language": "ru-RU,ru;q=0.9",
 }
 
-SALE_URL = BASE + "/tyumen/kvartiry/prodam/vtorichniy_rynok-ASgBAgICAkSSA8gQ8AeQUg"
+# ВНИМАНИЕ: этот URL для продажи не подтверждён живым тестом — прежняя
+# версия (с суффиксом -ASgBAgICAkSSA8gQ8AeQUg, скопированным по
+# аналогии с RENT_URL) на самом деле 301-редиректила на категорию
+# аренды, то есть была неверна. Формат ниже — стандартный человекочитаемый
+# путь категории без закодированного ID; работоспособность на момент
+# добавления не проверена из-за блокировки IP (см. README.md). Проверить
+# при следующем доступном окне и, если нужно, заменить на корректный
+# закодированный ID категории.
+SALE_URL = BASE + "/tyumen/kvartiry/prodam"
 RENT_URL = BASE + "/tyumen/kvartiry/sdam/na_dlitelnyy_srok-ASgBAgICAkSSA8gQ8AeQUg"
 
 
@@ -159,7 +167,14 @@ def scrape(start_url, max_pages=30, delay=6, stop_before_month=None, stop_before
         if not state:
             print("  Не удалось извлечь state, остановка", file=sys.stderr)
             break
-        catalog = state["loaderData"]["data"]["catalog"]
+        loader_data = state.get("loaderData", {}).get("data", {})
+        if loader_data.get("redirected"):
+            print(f"  URL редиректит на {loader_data.get('url')} — вероятно, неверная ссылка на категорию. Остановка.", file=sys.stderr)
+            break
+        if "catalog" not in loader_data:
+            print(f"  Нет ключа 'catalog' в ответе (ключи: {list(loader_data.keys())}) — структура страницы неожиданная. Остановка.", file=sys.stderr)
+            break
+        catalog = loader_data["catalog"]
         items = [it for it in catalog.get("items", []) if it.get("type") == "item"]
         if not items:
             print("  Нет объявлений, остановка")
