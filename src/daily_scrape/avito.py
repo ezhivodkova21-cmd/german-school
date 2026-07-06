@@ -5,18 +5,37 @@
 Метод: страница поиска содержит <script type="mime/invalid"
 data-mfe-state="true"> с полным JSON каталога
 (loaderData.data.catalog.items). Пагинация через catalog.pager.next.
-Сортировка по дате: s=104.
 
-Важно: Avito агрессивно ограничивает частоту запросов (429) и может
-выдать полную блокировку по IP ("Доступ ограничен: проблема с IP",
-403) при слишком частых обращениях. Скрипт делает паузы между
-страницами и останавливается при ошибке, а не повторяет бесконечно.
+Тип продавца ЧАСТИЧНО виден прямо в списке (без захода в объявление):
+поле item.iva.SecondLineStep[].payload.value содержит буквально текст
+"Агентство" для агентских объявлений и отсутствует/пусто для большинства
+частных объявлений. Сигнал не идеален — встречались единичные
+противоречивые случаи (например явный бейдж "Собственник" в
+BadgeBarStep при одновременно заполненном SecondLineStep="Агентство"),
+поэтому это эвристика, а не гарантия, но для практической фильтрации
+достаточно надёжна.
 
-Тип продавца (Риелтор/Собственник/Агентство) НЕ виден на странице
-списка — только на странице конкретного объявления. Проверка типа
-продавца для каждого объявления кратно увеличивает число запросов и
-риск блокировки, поэтому по умолчанию отключена (--check-seller
-включает её для ограниченного числа объявлений через --seller-limit).
+Важно про URL и сортировку:
+- RENT_URL — категорийный URL с закодированным ID, поддерживает
+  сортировку по дате (?s=104) и её можно использовать для ранней
+  остановки пагинации (объявления идут строго по убыванию даты).
+- SALE_URL — категории "продажа вторичного жилья" на Avito не
+  существует как отдельного SEO-пути; рабочий вариант — это
+  полнотекстовый поиск (?q=...). У него ДРУГАЯ реализация сортировки:
+  добавление ?s=104 к этому конкретному URL стабильно даёт 403
+  (проверено вживую) — вероятно, WAF считает такую комбинацию
+  подозрительной для текстового поиска. Поэтому для SALE_URL сортировка
+  не используется, объявления идут в порядке "по умолчанию"
+  (не хронологическом), и since_hours для него работает только как
+  пост-фильтр после сбора фиксированного числа страниц, а не как
+  условие ранней остановки — часть свежих объявлений на большую
+  глубину может быть пропущена.
+
+Важно про блокировки: Avito агрессивно ограничивает частоту запросов
+(429) и может выдать полную блокировку по IP ("Доступ ограничен:
+проблема с IP", 403) при слишком частых обращениях. Скрипт делает
+паузы между страницами и останавливается при ошибке, а не повторяет
+бесконечно.
 """
 import argparse
 import csv
@@ -26,6 +45,7 @@ import sys
 import time
 import urllib.request
 import urllib.error
+import urllib.parse
 from datetime import datetime, timedelta, timezone
 
 BASE = "https://www.avito.ru"
@@ -37,16 +57,14 @@ HEADERS = {
     "Accept-Language": "ru-RU,ru;q=0.9",
 }
 
-# ВНИМАНИЕ: этот URL для продажи не подтверждён живым тестом — прежняя
-# версия (с суффиксом -ASgBAgICAkSSA8gQ8AeQUg, скопированным по
-# аналогии с RENT_URL) на самом деле 301-редиректила на категорию
-# аренды, то есть была неверна. Формат ниже — стандартный человекочитаемый
-# путь категории без закодированного ID; работоспособность на момент
-# добавления не проверена из-за блокировки IP (см. README.md). Проверить
-# при следующем доступном окне и, если нужно, заменить на корректный
-# закодированный ID категории.
-SALE_URL = BASE + "/tyumen/kvartiry/prodam"
+# Подтверждено живым тестом: категорийного URL для "продажа вторичного
+# жилья" не существует, рабочий вариант — полнотекстовый поиск.
+# НЕ поддерживает сортировку по дате (?s=104 -> 403), см. docstring выше.
+SALE_URL = BASE + "/tyumen/kvartiry?q=" + urllib.parse.quote("продажа вторичной квартиры")
+# Категорийный URL, поддерживает ?s=104 (сортировка по дате).
 RENT_URL = BASE + "/tyumen/kvartiry/sdam/na_dlitelnyy_srok-ASgBAgICAkSSA8gQ8AeQUg"
+
+SORTABLE_URLS = {RENT_URL}
 
 
 def extract_mfe_state(html):
@@ -107,6 +125,19 @@ def parse_title(title):
     return type_label, rooms, area, floor
 
 
+def get_seller_type(item):
+    """Эвристика на основе iva.SecondLineStep: агентства почти всегда
+    показывают там текст "Агентство"; у частных объявлений это поле
+    обычно пустое. Не идеально надёжно (см. docstring модуля), поэтому
+    возвращаем "Вероятно собственник" вместо категоричного "Собственник"."""
+    steps = item.get("iva", {}).get("SecondLineStep", [])
+    for step in steps:
+        val = step.get("payload", {}).get("value", "")
+        if val:
+            return val
+    return "Вероятно собственник (нет метки агентства)"
+
+
 def normalize(item, source_label="Avito"):
     title = item.get("title", "")
     type_label, rooms, area, floor = parse_title(title)
@@ -133,7 +164,7 @@ def normalize(item, source_label="Avito"):
         "Комнат": rooms,
         "Этаж": floor,
         "ЖК/Комплекс": "",
-        "Кто разместил": "нет данных (не показано в списке)",
+        "Кто разместил": get_seller_type(item),
         "Объявлений у продавца": "нет данных (не показано в списке)",
         "Дата публикации": pub_date,
         "Ссылка": link,
@@ -154,8 +185,10 @@ def scrape(start_url, max_pages=30, delay=6, stop_before_month=None, stop_before
     результат строго по объявлениям новее этого числа часов (например
     24 для "за последние сутки")."""
     cutoff_ts = (datetime.now().timestamp() - since_hours * 3600) * 1000 if since_hours else None
+    sortable = start_url in SORTABLE_URLS
+    sep = "&" if "?" in start_url else "?"
+    url = f"{start_url}{sep}cd=1" + ("&s=104" if sortable else "")
     all_items = {}
-    url = f"{start_url}?cd=1&s=104"
     page = 1
     while url and page <= max_pages:
         print(f"Страница {page}...")
@@ -184,13 +217,15 @@ def scrape(start_url, max_pages=30, delay=6, stop_before_month=None, stop_before
 
         oldest_ts = min(it.get("allowTimeStamp", 0) for it in items)
         oldest_dt = datetime.fromtimestamp(oldest_ts / 1000)
-        print(f"  -> {len(items)} объявлений, старейшее: {oldest_dt.strftime('%Y-%m-%d')}")
-        if stop_before_year and (oldest_dt.year, oldest_dt.month) < (stop_before_year, stop_before_month):
-            print("  Достигли нижней границы дат, останавливаемся.")
-            break
-        if cutoff_ts and oldest_ts < cutoff_ts:
-            print("  Достигли границы 'since_hours', останавливаемся.")
-            break
+        print(f"  -> {len(items)} объявлений, старейшее на странице: {oldest_dt.strftime('%Y-%m-%d')}"
+              + ("" if sortable else " (порядок не хронологический, старейшее не значит конец)"))
+        if sortable:
+            if stop_before_year and (oldest_dt.year, oldest_dt.month) < (stop_before_year, stop_before_month):
+                print("  Достигли нижней границы дат, останавливаемся.")
+                break
+            if cutoff_ts and oldest_ts < cutoff_ts:
+                print("  Достигли границы 'since_hours', останавливаемся.")
+                break
 
         pager = catalog.get("pager", {})
         next_path = pager.get("next")
